@@ -5,7 +5,9 @@ const fs = require("fs");
 const BOT_TOKEN        = process.env.BOT_TOKEN;
 const RESULTS_CHANNEL  = process.env.RESULTS_CHANNEL;   // channel ID where YOU type !results
 const ANNOUNCE_CHANNEL = process.env.ANNOUNCE_CHANNEL;  // channel ID where winners are posted
-const ADMIN_USER_ID    = process.env.ADMIN_USER_ID;     // your Discord user ID (optional – restricts !results to you)
+const ADMIN_USER_IDS   = process.env.ADMIN_USER_IDS     // comma-separated Discord user IDs (optional – restricts !results to these users)
+  ? process.env.ADMIN_USER_IDS.split(",").map(id => id.trim())
+  : [];
 const DATA_FILE        = "./parlays.json";
 // ───────────────────────────────────────────────────────────────────────────
 
@@ -76,9 +78,9 @@ client.on("messageCreate", async (message) => {
   // ── Results command
   // Usage: !results Team1, Team2, Team3, Team4, Team5, Team6, Team7
   if (message.content.startsWith("!results")) {
-    // Optional: restrict to admin only
-    if (ADMIN_USER_ID && message.author.id !== ADMIN_USER_ID) {
-      return message.reply("❌ Only the league admin can enter results.");
+    // Optional: restrict to admins only
+    if (ADMIN_USER_IDS.length > 0 && !ADMIN_USER_IDS.includes(message.author.id)) {
+      return message.reply("❌ Only league admins can enter results.");
     }
     if (message.channel.id !== RESULTS_CHANNEL) {
       return message.reply(`❌ Use this command in the designated results channel.`);
