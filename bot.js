@@ -1,3 +1,6 @@
+Here's the full file to copy and paste:
+
+```javascript
 const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 
@@ -12,13 +15,13 @@ const DATA_FILE        = "./parlays.json";
 // ───────────────────────────────────────────────────────────────────────────
 
 const matchups = [
-  ["Dirty Little Leprechauns", "Bandit and Sons"],
-  ["MDVYN Maulers", "New Port Jets"],
-  ["Shanghai Squirters", "Silent Jay's Super Buys"],
-  ["Yolks Bouncing Buys", "Queens Wild"],
-  ["Baker King's Lucky Lines", "Bass Fish Fingers"],
-  ["Dave's Stickier Wilds", "New England Paytriots"],
-  ["No Limit Soljah", "Starnate Princess"],
+  ["MDVYN Maulers", "Baker King's Lucky Lines"],
+  ["New England Paytriots", "Silent Jay's Super Buys"],
+  ["Shanghai Squirters", "No Limit Soljah"],
+  ["Yolks Bouncing Buys", "Bass Fish Fingers"],
+  ["Queens Wild", "Bandit and Sons"],
+  ["Dirty Little Leprechauns", "Starnate Princess"],
+  ["Dave's Stickier Wilds", "New Port Jets"],
 ];
 
 // ─── STORAGE ───────────────────────────────────────────────────────────────
@@ -34,7 +37,6 @@ function saveParlays(parlays) {
 
 function addParlay(name, picks) {
   const parlays = loadParlays();
-  // Replace existing entry for same name (case-insensitive)
   const idx = parlays.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
   const entry = { name, picks, submittedAt: new Date().toISOString() };
   if (idx >= 0) parlays[idx] = entry;
@@ -58,9 +60,6 @@ client.once("ready", () => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  // ── Incoming webhook parlay (forwarded by the website via a second webhook or manual paste)
-  // The bot also listens for !addparlay for testing:
-  // !addparlay Name | Team1, Team2, Team3, Team4, Team5, Team6, Team7
   if (message.content.startsWith("!addparlay")) {
     const body = message.content.slice("!addparlay".length).trim();
     const [name, picksRaw] = body.split("|").map(s => s.trim());
@@ -75,10 +74,7 @@ client.on("messageCreate", async (message) => {
     return message.reply(`✅ Parlay saved for **${name}**!`);
   }
 
-  // ── Results command
-  // Usage: !results Team1, Team2, Team3, Team4, Team5, Team6, Team7
   if (message.content.startsWith("!results")) {
-    // Optional: restrict to admins only
     if (ADMIN_USER_IDS.length > 0 && !ADMIN_USER_IDS.includes(message.author.id)) {
       return message.reply("❌ Only league admins can enter results.");
     }
@@ -96,7 +92,6 @@ client.on("messageCreate", async (message) => {
       );
     }
 
-    // Validate each winner is a real team in the correct matchup
     for (let i = 0; i < matchups.length; i++) {
       const [a, b] = matchups[i];
       if (winners[i] !== a && winners[i] !== b) {
@@ -107,7 +102,6 @@ client.on("messageCreate", async (message) => {
       }
     }
 
-    // Score all parlays
     const parlays = loadParlays();
     if (parlays.length === 0) {
       return message.reply("⚠️ No parlays on file for this day.");
@@ -125,26 +119,19 @@ client.on("messageCreate", async (message) => {
 
     const perfect = results.filter(r => r.perfect);
     const sorted  = [...results].sort((a, b) => b.correct - a.correct);
-    const top     = sorted[0];
 
-    // Build the announcement embed
     const announceChannel = await client.channels.fetch(ANNOUNCE_CHANNEL).catch(() => null);
     if (!announceChannel) {
       return message.reply("❌ Couldn't find the announce channel. Check ANNOUNCE_CHANNEL in your env.");
     }
 
-    // ── Results summary embed
     const resultsEmbed = new EmbedBuilder()
       .setTitle("📊 GSL Day 5 — Official Results")
       .setColor(0xd4a843)
-      .setDescription(
-        winners.map((w, i) => `**Game ${i + 1}:** ${w}`).join("\n")
-      )
+      .setDescription(winners.map((w, i) => `**Game ${i + 1}:** ${w}`).join("\n"))
       .setTimestamp();
-
     await announceChannel.send({ embeds: [resultsEmbed] });
 
-    // ── Perfect parlays
     if (perfect.length > 0) {
       const perfectEmbed = new EmbedBuilder()
         .setTitle("🏆 PERFECT PARLAY!")
@@ -157,7 +144,6 @@ client.on("messageCreate", async (message) => {
       await announceChannel.send({ embeds: [perfectEmbed] });
     }
 
-    // ── Leaderboard embed (top 5)
     const leaderboard = sorted.slice(0, 5).map((r, i) => {
       const medal = ["🥇","🥈","🥉","4️⃣","5️⃣"][i];
       return `${medal} **${r.name}** — ${r.correct}/${matchups.length}`;
@@ -169,10 +155,8 @@ client.on("messageCreate", async (message) => {
       .setDescription(leaderboard)
       .setFooter({ text: `${parlays.length} total submissions` })
       .setTimestamp();
-
     await announceChannel.send({ embeds: [lbEmbed] });
 
-    // ── Individual breakdowns (sent as one message per person, collapsed)
     const breakdownLines = sorted.map(r => {
       const bar = r.breakdown.map(b => b.hit ? "✅" : "❌").join(" ");
       return `**${r.name}** ${bar} (${r.correct}/${matchups.length})`;
@@ -183,13 +167,11 @@ client.on("messageCreate", async (message) => {
       .setColor(0x555555)
       .setDescription(breakdownLines)
       .setTimestamp();
-
     await announceChannel.send({ embeds: [breakdownEmbed] });
 
     return message.reply(`✅ Results posted to <#${ANNOUNCE_CHANNEL}>!`);
   }
 
-  // ── Help
   if (message.content === "!gslhelp") {
     return message.reply(
       "**GSL Bot Commands**\n" +
@@ -201,22 +183,13 @@ client.on("messageCreate", async (message) => {
 });
 
 // ─── WEBHOOK RECEIVER ──────────────────────────────────────────────────────
-// The website POSTs to Discord's webhook. To also save to the bot's JSON store,
-// we parse the webhook messages as they arrive in the submissions channel.
-// Add the submissions channel ID to env as SUBMISSIONS_CHANNEL.
 const SUBMISSIONS_CHANNEL = process.env.SUBMISSIONS_CHANNEL;
 
 if (SUBMISSIONS_CHANNEL) {
   client.on("messageCreate", async (message) => {
     if (message.channel.id !== SUBMISSIONS_CHANNEL) return;
-    if (!message.author.bot) return; // Only process webhook/bot messages
+    if (!message.author.bot) return;
 
-    // Parse the format sent by the website:
-    // 📋 **New Parlay Submission**
-    // 👤 Name
-    //
-    // Game 1: Team
-    // Game 2: Team ...
     const content = message.content;
     if (!content.includes("New Parlay Submission")) return;
 
@@ -238,3 +211,4 @@ if (SUBMISSIONS_CHANNEL) {
 }
 
 client.login(BOT_TOKEN);
+```
