@@ -8,7 +8,7 @@ const fs = require("fs");
 const BOT_TOKEN        = MTQ3ODYxNTg0Mjc4NTcyNjQ5NQ.GyI5Z-.oD_BKxtBJtR5YPAtrDTlnUqOkBuwwFKDXVxO-E;
 const RESULTS_CHANNEL  = 1478618243663925298;   // channel ID where YOU type !results
 const ANNOUNCE_CHANNEL = 1478618243663925298;  // channel ID where winners are posted
-const ADMIN_USER_IDS   = 440432200442314752, 484369233266868246      // comma-separated Discord user IDs (optional – restricts !results to these users)
+const ADMIN_USER_IDS   = // comma-separated Discord user IDs (optional – restricts !results to these users)
   ? process.env.ADMIN_USER_IDS.split(",").map(id => id.trim())
   : [];
 const DATA_FILE        = "./parlays.json";
