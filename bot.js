@@ -188,6 +188,13 @@ client.on("messageCreate", async (message) => {
       "**GSL Bot Commands**\n" +
       "`!results Team1, Team2, ...` - Enter official results (admin only)\n" +
       "`!addparlay Name | Pick1, Pick2, ...` - Manually add a parlay\n" +
+      if (message.content === "!clearparlays") {
+  if (ADMIN_USER_IDS.length > 0 && !ADMIN_USER_IDS.includes(message.author.id)) {
+    return message.reply("Only admins can clear parlays.");
+  }
+  saveParlays([]);
+  return message.reply("All parlays cleared!");
+}
       "`!gslhelp` - Show this message"
     );
   }
