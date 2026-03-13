@@ -11,13 +11,13 @@ const SUBMISSIONS_CHANNEL = process.env.SUBMISSIONS_CHANNEL;
 const DATA_FILE        = "./parlays.json";
 
 const matchups = [
-  ["Daves Stickier Wilds", "Silent Jay's Super Buys"],
-  ["New England Paytriots", "No Limit Soljah"],
-  ["MDVYN Maulers", "Shanghai Squirters"],
-  ["Yolks Bouncing Buys", "Bandit and Sons"],
-  ["Queens Wild", "Starnate Princess"],
-  ["Baker Kings Lucky Lines", "Dirty Little Leprechauns"],
-  ["New Port Jets", "Bass Fish Fingers"],
+  ["Daves Stickier Wilds", "Dirty Little Leprechauns"],
+  ["Silent Jay's Super Buys", "Queens Wild"],
+  ["New Port Jets", "Baker Kings lucky Lines"],
+  ["New England Paytriots", "Bass Fish Fingers"],
+  ["MDVYN Maulers", "Yolks Bouncing Buys"],
+  ["Shanghai Squirters", "Starnate Princess"],
+  ["No Limit Soljah", "Bandit and Sons"],
 ];
 
 function loadParlays() {
