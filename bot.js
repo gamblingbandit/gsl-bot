@@ -16,7 +16,7 @@ const matchups = [
   ["MDVYN Maulers", "Shanghai Squirters"],
   ["Yolks Bouncing Buys", "Bandit and Sons"],
   ["Queens Wild", "Starnate Princess"],
-  ["Baker King's Lucky Lines", "Dirty Little Leprechauns"],
+  ["Baker Kings Lucky Lines", "Dirty Little Leprechauns"],
   ["New Port Jets", "Bass Fish Fingers"],
 ];
 
