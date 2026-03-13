@@ -11,7 +11,7 @@ const SUBMISSIONS_CHANNEL = process.env.SUBMISSIONS_CHANNEL;
 const DATA_FILE        = "./parlays.json";
 
 const matchups = [
-  ["Dave's Stickier Wilds", "Silent Jay's Super Buys"],
+  ["Daves Stickier Wilds", "Silent Jay's Super Buys"],
   ["New England Paytriots", "No Limit Soljah"],
   ["MDVYN Maulers", "Shanghai Squirters"],
   ["Yolks Bouncing Buys", "Bandit and Sons"],
